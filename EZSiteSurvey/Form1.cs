@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json;
 
 namespace EZSiteSurvey
 {
@@ -7,6 +8,7 @@ namespace EZSiteSurvey
         private Image? floorPlanImage;
         private List<WiFiScanPoint> scanPoints = new List<WiFiScanPoint>();
         private WiFiScanner wifiScanner = new WiFiScanner();
+        private string? currentFloorPlanPath;
 
         public Form1()
         {
@@ -25,6 +27,7 @@ namespace EZSiteSurvey
                     try
                     {
                         floorPlanImage = Image.FromFile(ofd.FileName);
+                        currentFloorPlanPath = ofd.FileName;
                         pictureBoxFloorPlan.Image = floorPlanImage;
                         statusLabel.Text = "Floor plan loaded. Click on the image to record WiFi data.";
                     }
@@ -500,6 +503,143 @@ namespace EZSiteSurvey
 
             // Save the current image from the picture box
             pictureBoxFloorPlan.Image.Save(filePath, format);
+        }
+
+        private void BtnSaveSurvey_Click(object? sender, EventArgs e)
+        {
+            if (scanPoints.Count == 0)
+            {
+                MessageBox.Show("No scan data to save. Click on the floor plan to record WiFi data first.",
+                    "No Data", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            using (SaveFileDialog sfd = new SaveFileDialog())
+            {
+                sfd.Filter = "Survey Data Files|*.survey";
+                sfd.Title = "Save WiFi Survey Data";
+                sfd.FileName = $"WiFiSurvey_{DateTime.Now:yyyyMMdd_HHmmss}.survey";
+
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        SaveSurveyData(sfd.FileName);
+                        statusLabel.Text = $"Survey saved to {Path.GetFileName(sfd.FileName)}";
+                        MessageBox.Show($"Successfully saved survey with {scanPoints.Count} scan points.",
+                            "Save Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        statusLabel.Text = "Error saving survey";
+                        MessageBox.Show($"Error saving survey: {ex.Message}",
+                            "Save Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
+        private void BtnLoadSurvey_Click(object? sender, EventArgs e)
+        {
+            using (OpenFileDialog ofd = new OpenFileDialog())
+            {
+                ofd.Filter = "Survey Data Files|*.survey|All Files|*.*";
+                ofd.Title = "Load WiFi Survey Data";
+
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        LoadSurveyData(ofd.FileName);
+                        statusLabel.Text = $"Survey loaded: {scanPoints.Count} scan points";
+                        MessageBox.Show($"Successfully loaded survey with {scanPoints.Count} scan points.",
+                            "Load Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        statusLabel.Text = "Error loading survey";
+                        MessageBox.Show($"Error loading survey: {ex.Message}",
+                            "Load Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
+        private void SaveSurveyData(string filePath)
+        {
+            var surveyData = new SurveyData
+            {
+                FloorPlanPath = currentFloorPlanPath,
+                ScanPoints = scanPoints,
+                SavedDate = DateTime.Now
+            };
+
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNameCaseInsensitive = true
+            };
+
+            string jsonString = JsonSerializer.Serialize(surveyData, options);
+            File.WriteAllText(filePath, jsonString);
+        }
+
+        private void LoadSurveyData(string filePath)
+        {
+            string jsonString = File.ReadAllText(filePath);
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            var surveyData = JsonSerializer.Deserialize<SurveyData>(jsonString, options);
+
+            if (surveyData == null)
+            {
+                throw new Exception("Failed to deserialize survey data.");
+            }
+
+            // Load the scan points
+            scanPoints.Clear();
+            scanPoints.AddRange(surveyData.ScanPoints);
+
+            // Try to load the floor plan if path is available
+            if (!string.IsNullOrEmpty(surveyData.FloorPlanPath) && File.Exists(surveyData.FloorPlanPath))
+            {
+                try
+                {
+                    floorPlanImage = Image.FromFile(surveyData.FloorPlanPath);
+                    currentFloorPlanPath = surveyData.FloorPlanPath;
+                    pictureBoxFloorPlan.Image = floorPlanImage;
+                }
+                catch
+                {
+                    MessageBox.Show($"Could not load floor plan from: {surveyData.FloorPlanPath}\n\n" +
+                                  "Please load the floor plan manually to generate heatmaps.",
+                        "Floor Plan Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            else if (!string.IsNullOrEmpty(surveyData.FloorPlanPath))
+            {
+                MessageBox.Show($"Floor plan not found at: {surveyData.FloorPlanPath}\n\n" +
+                              "Please load the floor plan manually to generate heatmaps.",
+                    "Floor Plan Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            // Update the UI
+            listBoxPoints.Items.Clear();
+            foreach (var point in scanPoints)
+            {
+                listBoxPoints.Items.Add(point.ToString());
+            }
+
+            UpdateBSSIDComboBox();
+
+            if (floorPlanImage != null)
+            {
+                DrawPointsOnFloorPlan();
+            }
         }
 
         private void pictureBoxFloorPlan_Click(object sender, EventArgs e)

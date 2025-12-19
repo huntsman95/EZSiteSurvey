@@ -39,6 +39,8 @@
             statusLabel = new Label();
             btnExportCSV = new Button();
             btnExportHeatmap = new Button();
+            btnSaveSurvey = new Button();
+            btnLoadSurvey = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBoxFloorPlan).BeginInit();
             SuspendLayout();
             // 
@@ -76,9 +78,9 @@
             // 
             // btnGenerateHeatmap
             // 
-            btnGenerateHeatmap.Location = new Point(1688, 500);
+            btnGenerateHeatmap.Location = new Point(1700, 500);
             btnGenerateHeatmap.Name = "btnGenerateHeatmap";
-            btnGenerateHeatmap.Size = new Size(280, 35);
+            btnGenerateHeatmap.Size = new Size(359, 35);
             btnGenerateHeatmap.TabIndex = 3;
             btnGenerateHeatmap.Text = "Generate Heatmap";
             btnGenerateHeatmap.UseVisualStyleBackColor = true;
@@ -89,16 +91,16 @@
             listBoxPoints.FormattingEnabled = true;
             listBoxPoints.Location = new Point(1538, 90);
             listBoxPoints.Name = "listBoxPoints";
-            listBoxPoints.Size = new Size(430, 344);
+            listBoxPoints.Size = new Size(521, 344);
             listBoxPoints.TabIndex = 4;
             // 
             // comboBoxBSSID
             // 
             comboBoxBSSID.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxBSSID.FormattingEnabled = true;
-            comboBoxBSSID.Location = new Point(1688, 460);
+            comboBoxBSSID.Location = new Point(1700, 460);
             comboBoxBSSID.Name = "comboBoxBSSID";
-            comboBoxBSSID.Size = new Size(280, 28);
+            comboBoxBSSID.Size = new Size(359, 28);
             comboBoxBSSID.TabIndex = 5;
             // 
             // labelBSSID
@@ -122,7 +124,7 @@
             // statusLabel
             // 
             statusLabel.AutoSize = true;
-            statusLabel.Location = new Point(294, 20);
+            statusLabel.Location = new Point(579, 19);
             statusLabel.Name = "statusLabel";
             statusLabel.Size = new Size(262, 20);
             statusLabel.TabIndex = 8;
@@ -130,9 +132,9 @@
             // 
             // btnExportCSV
             // 
-            btnExportCSV.Location = new Point(1688, 545);
+            btnExportCSV.Location = new Point(1700, 545);
             btnExportCSV.Name = "btnExportCSV";
-            btnExportCSV.Size = new Size(280, 35);
+            btnExportCSV.Size = new Size(359, 35);
             btnExportCSV.TabIndex = 9;
             btnExportCSV.Text = "Export to CSV";
             btnExportCSV.UseVisualStyleBackColor = true;
@@ -140,19 +142,41 @@
             // 
             // btnExportHeatmap
             // 
-            btnExportHeatmap.Location = new Point(1688, 590);
+            btnExportHeatmap.Location = new Point(1700, 590);
             btnExportHeatmap.Name = "btnExportHeatmap";
-            btnExportHeatmap.Size = new Size(280, 35);
+            btnExportHeatmap.Size = new Size(359, 35);
             btnExportHeatmap.TabIndex = 10;
             btnExportHeatmap.Text = "Export Heatmap Image";
             btnExportHeatmap.UseVisualStyleBackColor = true;
             btnExportHeatmap.Click += BtnExportHeatmap_Click;
             // 
+            // btnSaveSurvey
+            // 
+            btnSaveSurvey.Location = new Point(294, 12);
+            btnSaveSurvey.Name = "btnSaveSurvey";
+            btnSaveSurvey.Size = new Size(120, 35);
+            btnSaveSurvey.TabIndex = 11;
+            btnSaveSurvey.Text = "Save Survey";
+            btnSaveSurvey.UseVisualStyleBackColor = true;
+            btnSaveSurvey.Click += BtnSaveSurvey_Click;
+            // 
+            // btnLoadSurvey
+            // 
+            btnLoadSurvey.Location = new Point(420, 12);
+            btnLoadSurvey.Name = "btnLoadSurvey";
+            btnLoadSurvey.Size = new Size(120, 35);
+            btnLoadSurvey.TabIndex = 12;
+            btnLoadSurvey.Text = "Load Survey";
+            btnLoadSurvey.UseVisualStyleBackColor = true;
+            btnLoadSurvey.Click += BtnLoadSurvey_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1993, 1003);
+            ClientSize = new Size(2071, 1003);
+            Controls.Add(btnLoadSurvey);
+            Controls.Add(btnSaveSurvey);
             Controls.Add(btnExportHeatmap);
             Controls.Add(btnExportCSV);
             Controls.Add(statusLabel);
@@ -184,5 +208,7 @@
         private Label statusLabel;
         private Button btnExportCSV;
         private Button btnExportHeatmap;
+        private Button btnSaveSurvey;
+        private Button btnLoadSurvey;
     }
 }
