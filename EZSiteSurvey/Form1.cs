@@ -212,6 +212,66 @@ namespace EZSiteSurvey
             }
         }
 
+        private void BtnExportHeatmap_Click(object? sender, EventArgs e)
+        {
+            // Check if we have a heatmap to export (picture box should contain a generated heatmap, not just the floor plan)
+            if (pictureBoxFloorPlan.Image == null)
+            {
+                MessageBox.Show("No image to export. Please load a floor plan first.", 
+                    "No Image", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (floorPlanImage == null)
+            {
+                MessageBox.Show("Please load a floor plan image first.", 
+                    "No Floor Plan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            using (SaveFileDialog sfd = new SaveFileDialog())
+            {
+                sfd.Filter = "PNG Image|*.png|JPEG Image|*.jpg|Bitmap Image|*.bmp";
+                sfd.Title = "Export Heatmap Image";
+                
+                // Generate filename with network name if a heatmap is displayed
+                string fileName = "Heatmap";
+                if (comboBoxBSSID.SelectedItem != null)
+                {
+                    string selectedNetwork = comboBoxBSSID.SelectedItem.ToString()!;
+                    // Extract SSID for filename
+                    int parenIndex = selectedNetwork.IndexOf('(');
+                    if (parenIndex > 0)
+                    {
+                        string ssid = selectedNetwork.Substring(0, parenIndex).Trim();
+                        // Remove invalid filename characters
+                        ssid = string.Join("_", ssid.Split(Path.GetInvalidFileNameChars()));
+                        fileName = $"Heatmap_{ssid}";
+                    }
+                }
+                
+                sfd.FileName = $"{fileName}_{DateTime.Now:yyyyMMdd_HHmmss}.png";
+                sfd.FilterIndex = 1; // Default to PNG
+
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        ExportHeatmapImage(sfd.FileName, sfd.FilterIndex);
+                        statusLabel.Text = $"Heatmap exported to {Path.GetFileName(sfd.FileName)}";
+                        MessageBox.Show($"Successfully exported heatmap image.", 
+                            "Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        statusLabel.Text = "Error exporting heatmap";
+                        MessageBox.Show($"Error exporting heatmap: {ex.Message}", 
+                            "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
         private void ExportToCSV(string filePath)
         {
             var csv = new StringBuilder();
@@ -422,6 +482,24 @@ namespace EZSiteSurvey
                 return Color.FromArgb(0, 255, 0);        // Green
             else                          // -35.8 to -30 dBm
                 return Color.FromArgb(0, 128, 0);        // Dark Green (Excellent)
+        }
+
+        private void ExportHeatmapImage(string filePath, int filterIndex)
+        {
+            if (pictureBoxFloorPlan.Image == null)
+                return;
+
+            // Determine the image format based on filter selection
+            System.Drawing.Imaging.ImageFormat format = filterIndex switch
+            {
+                1 => System.Drawing.Imaging.ImageFormat.Png,
+                2 => System.Drawing.Imaging.ImageFormat.Jpeg,
+                3 => System.Drawing.Imaging.ImageFormat.Bmp,
+                _ => System.Drawing.Imaging.ImageFormat.Png
+            };
+
+            // Save the current image from the picture box
+            pictureBoxFloorPlan.Image.Save(filePath, format);
         }
 
         private void pictureBoxFloorPlan_Click(object sender, EventArgs e)

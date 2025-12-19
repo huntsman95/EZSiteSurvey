@@ -38,6 +38,7 @@
             labelPoints = new Label();
             statusLabel = new Label();
             btnExportCSV = new Button();
+            btnExportHeatmap = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBoxFloorPlan).BeginInit();
             SuspendLayout();
             // 
@@ -137,11 +138,22 @@
             btnExportCSV.UseVisualStyleBackColor = true;
             btnExportCSV.Click += BtnExportCSV_Click;
             // 
+            // btnExportHeatmap
+            // 
+            btnExportHeatmap.Location = new Point(1688, 590);
+            btnExportHeatmap.Name = "btnExportHeatmap";
+            btnExportHeatmap.Size = new Size(280, 35);
+            btnExportHeatmap.TabIndex = 10;
+            btnExportHeatmap.Text = "Export Heatmap Image";
+            btnExportHeatmap.UseVisualStyleBackColor = true;
+            btnExportHeatmap.Click += BtnExportHeatmap_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1993, 1003);
+            Controls.Add(btnExportHeatmap);
             Controls.Add(btnExportCSV);
             Controls.Add(statusLabel);
             Controls.Add(labelPoints);
@@ -171,5 +183,6 @@
         private Label labelPoints;
         private Label statusLabel;
         private Button btnExportCSV;
+        private Button btnExportHeatmap;
     }
 }
