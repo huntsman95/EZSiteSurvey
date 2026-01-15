@@ -6,6 +6,9 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Authors>Hunter Klein</Authors>
+    <Company>Skryptek, LLC.</Company>
+    <Copyright>Copyright © 2026 Skryptek, LLC.</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
